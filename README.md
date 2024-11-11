@@ -1,6 +1,5 @@
-# Grass2.0！由推特用户雪糕战神@Hy78516012开源！无任何收费！
-# 2.0是第二季的意思不是2倍哈兄弟们别误解了
-
+# Grass二倍积分版本！由推特用户雪糕战神@Hy78516012开源！无任何收费！
+# 
 # 注册
 
 没有注册的可以支持一下我，走我的邀请链接谢谢：[点击这里](https://app.getgrass.io/register/?referralCode=W2P80MXsTm9LaC6)
@@ -9,7 +8,7 @@
 
 所有女巫风险由用户自行承担！
 
-本程序仅支持一个账户可多IP
+本程序仅支持一个账户，可以同时一个账号多个IP
 
 # 关于代理
 不做任何代理推荐！！！
@@ -32,14 +31,14 @@ socks5://user:password@host:port
 
 3. 克隆此仓库。你可以使用以下命令：
    ```shell
-   git clone https://github.com/GzGod/Grass2.0
+   git clone https://github.com/GzGod/bestgrass.git
    如果这个方式不行那就直接把这个库保存为压缩包 右上角code里可以看到
    然后解压之后把路径复制到powershell里输入"cd 你的路径"
    ```
 
 4. 进入 grass 文件夹：
    ```shell
-   cd Grass2.0
+   cd bestGrass
    ```
 
 5. 然后安装所需的库：
