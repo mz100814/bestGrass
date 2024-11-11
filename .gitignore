@@ -1,0 +1,8 @@
+*.json
+env
+*.txt
+!proxies.txt
+!requirements.txt
+*.html
+!token.txt
+!userid.txt
