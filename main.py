@@ -41,7 +41,7 @@ class Grass:
         browser_id = uuid.uuid5(uuid.NAMESPACE_URL, proxy)
         useragent = UserAgent().random
         headers = {
-            "Host": "proxy2.wynd.network:4650",
+            "Host": "proxy2.wynd.network:80",
             "Connection": "Upgrade",
             "Pragma": "no-cache",
             "Cache-Control": "no-cache",
@@ -58,7 +58,7 @@ class Grass:
                     await self.ses.close()
                     return
                 async with self.ses.ws_connect(
-                    "wss://proxy2.wynd.network:4650/",
+                    "wss://proxy2.wynd.network:80/",
                     headers=headers,
                     proxy=self.proxy,
                     timeout=1000,
