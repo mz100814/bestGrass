@@ -41,7 +41,7 @@ class Grass:
         browser_id = uuid.uuid5(uuid.NAMESPACE_URL, proxy)
         useragent = UserAgent().random
         headers = {
-            "Host": "proxy2.wynd.network:4600",
+            "Host": "proxy2.wynd.network:4444",
             "Connection": "Upgrade",
             "Pragma": "no-cache",
             "Cache-Control": "no-cache",
