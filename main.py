@@ -29,7 +29,7 @@ class Grass:
     @staticmethod
     async def ipinfo(proxy=None):
         async with aiohttp.ClientSession() as client:
-            result = await client.get("https://api.ipify.org/", proxy=proxy)
+            result = await client.get("http://api.ipify.cn/", proxy=proxy)
             return await result.text()
 
     async def start(self):
@@ -54,21 +54,28 @@ class Grass:
         while True:
             try:
                 if retry >= max_retry:
-                    self.log(f"{yellow}max retrying reacted, skip the proxy !")
+                    self.log(f"{yellow}达到最大重试次数，跳过此代理！")
                     await self.ses.close()
                     return
+                    
                 async with self.ses.ws_connect(
-                    "wss://proxy2.wynd.network:80/",
+                    "wss://proxy2.wynd.network:4444/",
                     headers=headers,
                     proxy=self.proxy,
                     timeout=1000,
                     autoclose=False,
                 ) as wss:
+                    # 检查连接状态
+                    if wss.closed:
+                        self.log(f"{red}WebSocket连接已关闭")
+                        continue
+                        
                     res = await wss.receive_json()
                     auth_id = res.get("id")
                     if auth_id is None:
-                        self.log(f"{red}auth id is None")
-                        return None
+                        self.log(f"{red}auth id 为空")
+                        continue
+                        
                     auth_data = {
                         "id": auth_id,
                         "origin_action": "AUTH",
@@ -85,26 +92,34 @@ class Grass:
                     await wss.send_json(auth_data)
                     self.log(f"{green}成功连接 {white}到服务器!")
                     retry = 1
-                    while True:
-                        ping_data = {
-                            "id": uuid.uuid4().__str__(),
-                            "version": "1.0.0",
-                            "action": "PING",
-                            "data": {},
-                        }
-                        await wss.send_json(ping_data)
-                        self.log(f"{white}发送 {green}ping {white}到服务器 !")
-                        pong_data = {"id": "F3X", "origin_action": "PONG"}
-                        await wss.send_json(pong_data)
-                        self.log(f"{white}发送 {magenta}pong {white}到服务器 !")
-                        # you can edit the countdown in code below
-                        await countdown(120)
+                    
+                    while not wss.closed:  # 添加连接状态检查
+                        try:
+                            ping_data = {
+                                "id": uuid.uuid4().__str__(),
+                                "version": "1.0.0",
+                                "action": "PING",
+                                "data": {},
+                            }
+                            await wss.send_json(ping_data)
+                            self.log(f"{white}发送 {green}ping {white}到服务器 !")
+                            
+                            pong_data = {"id": "F3X", "origin_action": "PONG"}
+                            await wss.send_json(pong_data)
+                            self.log(f"{white}发送 {magenta}pong {white}到服务器 !")
+                            
+                            await countdown(120)
+                        except Exception as e:
+                            self.log(f"{red}ping/pong错误: {white}{str(e)}")
+                            break  # 发生错误时退出内部循环
+                            
             except KeyboardInterrupt:
                 await self.ses.close()
                 exit()
             except Exception as e:
-                self.log(f"{red}error : {white}{e}")
+                self.log(f"{red}连接错误: {white}{str(e)}")
                 retry += 1
+                await asyncio.sleep(1)  # 添加重试延迟
                 continue
 
 
