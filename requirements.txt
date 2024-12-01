@@ -1,3 +1,4 @@
 colorama
 aiohttp
+aiohttp_socks
 fake-useragent
