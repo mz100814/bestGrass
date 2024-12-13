@@ -197,13 +197,8 @@ class Grass:
             exit()
 
 async def countdown(t):
+    print(f"waiting {t}s.")
     for i in range(t, 0, -1):
-        minute, seconds = divmod(i, 60)
-        hour, minute = divmod(minute, 60)
-        seconds = str(seconds).zfill(2)
-        minute = str(minute).zfill(2)
-        hour = str(hour).zfill(2)
-        print(f"waiting for {hour}:{minute}:{seconds} ", flush=True, end="\r")
         await asyncio.sleep(1)
 
 
