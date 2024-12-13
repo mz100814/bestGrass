@@ -1,6 +1,5 @@
 import os
 import uuid
-import json
 import aiohttp
 import argparse
 from datetime import datetime, timezone
@@ -15,7 +14,8 @@ black = Fore.LIGHTBLACK_EX
 reset = Style.RESET_ALL
 yellow = Fore.LIGHTYELLOW_EX
 
-from aiohttp_socks import ProxyConnector
+from aiohttp_socks import ProxyType, ProxyConnector
+from aiohttp import ClientWSTimeout
 
 
 class Grass:
@@ -29,7 +29,34 @@ class Grass:
         如果提供了代理，返回一个 ProxyConnector；否则返回 None。
         """
         if proxy:
-            return ProxyConnector.from_url(proxy)
+            try:
+                # 解析代理字符串
+                proxy_type = ProxyType.SOCKS5 if proxy.startswith('socks5://') else ProxyType.HTTP
+                
+                # 从代理URL中提取认证信息和地址
+                proxy = proxy.replace('socks5://', '').replace('http://', '')
+                if '@' in proxy:
+                    auth, addr = proxy.split('@')
+                    username, password = auth.split(':')
+                    host, port = addr.split(':')
+                    port = int(port)
+                else:
+                    username = password = None
+                    host, port = proxy.split(':')
+                    port = int(port)
+
+                # 创建新的connector
+                return ProxyConnector(
+                    proxy_type=proxy_type,
+                    host=host,
+                    port=port,
+                    username=username,
+                    password=password,
+                    rdns=True
+                )
+            except Exception as e:
+                print(f"{red}代理解析错误: {str(e)}{reset}")
+                return None
         return None
 
     def log(self, msg):
@@ -44,12 +71,17 @@ class Grass:
 
     async def create_websocket_connection(self, headers):
         """创建 WebSocket 连接"""
-        return await self.ses.ws_connect(
-            "wss://proxy2.wynd.network:4444/",
-            headers=headers,
-            timeout=1000,
-            autoclose=False,
-        )
+        try:
+            return await self.ses.ws_connect(
+                "wss://proxy2.wynd.network:4444/",
+                headers=headers,
+                timeout=ClientWSTimeout(ws_close=1000),
+                autoclose=False,
+                ssl=False
+            )
+        except Exception as e:
+            self.log(f"{red}WebSocket 连接错误: {str(e)}{reset}")
+            raise
 
     async def handle_authentication(self, wss, browser_id, useragent):
         """处理认证流程"""

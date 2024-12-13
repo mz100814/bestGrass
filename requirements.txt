@@ -1,4 +1,4 @@
 colorama
-aiohttp
-aiohttp_socks
+aiohttp>=3.8.0
+aiohttp-socks>=0.7.1
 fake-useragent
